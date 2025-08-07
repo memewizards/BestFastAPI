@@ -1,0 +1,109 @@
+
+##Older version which I used for meme wizards tasking main branch
+# #!/bin/bash
+
+# # Get the current branch name
+# branch=$(git symbolic-ref --short HEAD)
+
+# # Only run on main/master branch
+# if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+#     echo "Running pre-push hook for $branch branch..."
+    
+#     # Run rollup build with production mode
+#     export BUILD_MODE=production
+#     npm run build
+    
+#     # Install javascript-obfuscator if not already installed
+#     if ! command -v javascript-obfuscator &> /dev/null; then
+#         echo "Installing javascript-obfuscator..."
+#         npm install -g javascript-obfuscator
+#     fi
+    
+#     # Obfuscate the bundle.js file
+#     echo "Obfuscating bundle.js..."
+#     javascript-obfuscator public/static/bundle.js --output public/static/bundle.js \
+#         --compact true \
+#         --control-flow-flattening true \
+#         --control-flow-flattening-threshold 0.7 \
+#         --dead-code-injection true \
+#         --dead-code-injection-threshold 0.4 \
+#         --string-array true \
+#         --rotate-string-array true \
+#         --self-defending true
+    
+#     # Add the obfuscated bundle to git
+#     git add public/static/bundle.js
+    
+#     # Create a temporary commit for the obfuscated bundle
+#     git commit -m "chore: Update obfuscated bundle [pre-push hook]"
+    
+#     echo "Pre-push hook completed successfully"
+# else
+#     echo "Skipping pre-push hook for $branch branch"
+# fi
+
+# exit 0 
+
+#!/bin/bash
+#!/bin/bash
+# First, ensure we're in the repository root
+cd "$(git rev-parse --show-toplevel)/frontend" || { echo "Cannot cd to frontend directory"; exit 1; }
+
+# Get the current branch name from the root repository
+branch=$(git rev-parse --abbrev-ref HEAD)
+echo "Current branch: $branch"
+
+# Determine API base URL based on branch
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+    echo "Running pre-push hook for $branch branch (production)..."
+    api_url="https://memewizards.com"
+elif [ "$branch" = "wip" ]; then
+    echo "Running pre-push hook for $branch branch (testing)..."
+    api_url="https://meme-wizards-tasking-testing.onrender.com"
+else
+    echo "Skipping pre-push hook for branch: $branch"
+    exit 0
+fi
+
+# Log the value being injected
+echo "🚀 Injecting API_BASE_URL=$api_url"
+
+# Overwrite .env.production with the correct API base URL and build mode
+echo "API_BASE_URL=$api_url" > .env.production
+echo "BUILD_MODE=production" >> .env.production
+
+# Debug: Show the contents of .env.production
+echo "📄 New .env.production contents:"
+cat .env.production
+
+# Export BUILD_MODE into the environment so that Rollup sees it
+export BUILD_MODE=production
+
+# Run the build (Rollup will load .env.production because BUILD_MODE is 'production')
+npm run build
+
+# Obfuscate the build output
+if ! command -v javascript-obfuscator &> /dev/null; then
+    echo "Installing javascript-obfuscator..."
+    npm install -g javascript-obfuscator
+fi
+
+echo "🛡️  Obfuscating bundle.js..."
+javascript-obfuscator public/static/bundle.js --output public/static/bundle.js \
+    --compact true \
+    --control-flow-flattening true \
+    --control-flow-flattening-threshold 0.7 \
+    --dead-code-injection true \
+    --dead-code-injection-threshold 0.4 \
+    --string-array true \
+    --rotate-string-array true \
+    --self-defending true
+
+# Add and commit the obfuscated file
+git add public/static/bundle.js
+git commit -m "chore: Update obfuscated bundle [pre-push hook for $branch]"
+
+echo "✅ Pre-push hook for $branch completed"
+exit 0
+
+

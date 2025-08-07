@@ -1,0 +1,13 @@
+bcrypt==4.2.1
+cryptography==43.0.3
+email_validator==2.2.0
+fastapi==0.115.8
+passlib==1.7.4
+psycopg2-binary==2.9.10
+PyJWT==2.10.1
+python-dotenv==1.0.1
+python-multipart==0.0.20
+requests==2.32.3
+SQLAlchemy==2.0.37
+gunicorn==21.2.0
+uvicorn==0.30.6

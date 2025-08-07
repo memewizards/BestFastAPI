@@ -1,0 +1,529 @@
+/* ===========================
+   1) Node container styling
+   =========================== */
+     .node-container {
+   background-color: #2B2B2B;       /* ComfyUI dark gray */
+   border: 1px solid #444;          /* subtle light-gray border */
+   border-radius: 8px;              /* rounded corners */
+   padding: 12px;                   /* uniform inner padding */
+   font-family: "Segoe UI", sans-serif;
+   color: #DDD;                     /* light text on dark bg */
+   width: 250px;                    /* fixed width (adjust as needed) */
+   box-sizing: border-box;          /* include padding in width */
+   overflow: hidden;
+   /* Prevent drag interference with resize */
+   position: relative;
+   /*
+    * This is CRITICAL for preventing the "sliding" bug during resize.
+    * It ensures that all transformations (like resizing) originate from
+    * the top-left corner (0, 0) of the node. Without this, the browser
+    * defaults to the center, causing the node to shift its position
+    * when resized from any handle other than the bottom-right.
+    */
+   transform-origin: 0 0;
+ }
+  
+  .node-container.selected {
+    border: 2px solid #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+  }
+  
+  /* Title bar */
+  .node-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: #1F1F1F;       /* slightly darker than body */
+    padding: 6px 10px;
+    border-bottom: 1px solid #444;
+    border-top-left-radius: 7px;     /* match container's corners */
+    border-top-right-radius: 7px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #EEE;
+  }
+  
+  /* Optional "#ID" badge in the top-right corner */
+  .node-header .node-badge {
+    background-color: #2C5F2D;       /* ComfyUI uses a dark-green accent */
+    color: #B4FF9F;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  
+  /* ============================
+     2) Rows of inputs/controls
+     ============================ */
+  .node-row {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;                  /* spacing between rows */
+  }
+  
+  /* Label text to the right of a port */
+  .node-row .row-label {
+    margin-left: 8px;                /* space between port and label */
+    font-size: 13px;
+    flex-grow: 1;                    /* allow label to expand */
+  }
+  
+  /* Slider / dropdown / text inside a row */
+  .node-row .row-control {
+    margin-left: auto;               /* push control to right edge */
+    font-size: 13px;
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #EEE;
+    height: 24px;
+    line-height: 24px;
+    padding: 0 8px;
+  }
+  
+  /* Example: to style a dropdown */
+  .node-row .row-control select {
+    background-color: #333;
+    border: none;
+    color: #EEE;
+  }
+  
+  
+  /* Override specific port types to use same size */
+  .node-port.image_in,
+  .node-port.video_out,
+  .node-port.latent_in,
+  .node-port.latent_out {
+    width: 16px;
+    height: 16px;
+    border-radius: 18px;
+  }
+  
+  /* Input-type colors (adjust hex to match your scheme exactly) */
+  .node-port.model       { background-color: #A34FFC; } /* purple */
+  .node-port.positive    { background-color: #F5A623; } /* orange */
+  .node-port.negative    { background-color: #F5A623; } /* orange */
+  .node-port.latent_in   { background-color: #FF3CAC; } /* pink */
+  
+  /* Output-type color (on the right) */
+  .node-port.latent_out  { background-color: #FF3CAC; } /* pink */
+  
+  /* Audio port color: green */
+  .node-port.audio_in    { background-color: #2C5F2D; } /* green */
+  .node-port.audio_out   { background-color: #2C5F2D; } /* green */
+  
+  /* Right-side output port row */
+  .node-row--output {
+    flex-direction: row-reverse;     /* port on right, label on left */
+    margin-top: 8px;
+  }
+  
+  /* Vertical layout for URI inputs (label above control) */
+  .node-row--vertical {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .node-row--vertical .row-label {
+    margin-bottom: 4px;
+  }
+  
+  /* ============================
+     4) Text-entry rows (choices, file chooser, etc.)
+     ============================ */
+  .text-field {
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #EEE;
+    height: 24px;
+    padding: 0 6px;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+  }
+  
+  /* "Delete" (×) button on each line: */
+  .text-field + .delete-btn {
+    background: none;
+    border: none;
+    color: #E64C4C;                   /* red "×" color */
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  /* Image preview (if you embed an image) */
+  .node-image-preview {
+    width: 100%;
+    border: 1px solid #444;
+    border-radius: 4px;
+    margin: 8px 0;
+    object-fit: cover;
+  }
+  
+  /* Comfy-style choice rows */
+  .choice-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .choice-row .node-port {
+    margin-right: 8px;
+  }
+  .choice-row .text-field {
+    flex-grow: 1;
+    margin-bottom: 0;
+    margin-right: 8px;
+  }
+  .choice-row .delete-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin-right: 8px;
+    position: relative;
+    z-index: 10;
+  }
+  .choice-row .delete-btn:hover {
+    color: #CCC;
+  }
+  
+  /* Dynamic styling for handles: empty until connected */
+  .node-port.latent_in:not(.connected),
+  .node-port.latent_out:not(.connected) {
+    background: transparent !important;
+    border: 2px solid #FF3CAC !important;
+  }
+  .node-port.latent_in.connected,
+  .node-port.latent_out.connected {
+    background: #FF3CAC !important;
+    border: none !important;
+  }
+  .node-port.audio_in:not(.connected),
+  .node-port.audio_out:not(.connected) {
+    background: transparent !important;
+    border: 2px solid #2C5F2D !important;
+  }
+  .node-port.audio_in.connected,
+  .node-port.audio_out.connected {
+    background: #2C5F2D !important;
+    border: none !important;
+  }
+  
+  /* Media builder node-specific port colors */
+  .image-gen-node .node-port.latent_in:not(.connected),
+  .image-gen-node .node-port.latent_out:not(.connected) {
+    border-color: #FD7E14 !important;
+  }
+  .image-gen-node .node-port.latent_in.connected,
+  .image-gen-node .node-port.latent_out.connected {
+    background: #FD7E14 !important;
+    border: none !important;
+  }
+  .video-gen-node .node-port.latent_in:not(.connected),
+  .video-gen-node .node-port.latent_out:not(.connected) {
+    border-color: #17A2B8 !important;
+  }
+  .video-gen-node .node-port.latent_in.connected,
+  .video-gen-node .node-port.latent_out.connected {
+    background: #17A2B8 !important;
+    border: none !important;
+  }
+  
+  /* Override for image_in and video_out handles */
+  .node-port.image_in:not(.connected) {
+    background: transparent !important;
+    border: 2px solid #FD7E14 !important;
+  }
+  .node-port.image_in.connected {
+    background: #FD7E14 !important;
+    border: none !important;
+  }
+  .node-port.video_out:not(.connected) {
+    background: transparent !important;
+    border: 2px solid #17A2B8 !important;
+  }
+  .node-port.video_out.connected {
+    background: #17A2B8 !important;
+    border: none !important;
+  }
+  
+  /* Position multiple image input handles */
+  .image-gen-node .node-port.initImageUrl {
+    top: 40% !important;
+  }
+  .image-gen-node .node-port.auxImageUrl {
+    top: 60% !important;
+  }
+
+  /* ============================
+     5) Calculator Node Styling (NEW)
+     ============================ */
+  
+  /* Calculator node container - improved styling */
+  .calculator-node {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #E5E7EB;
+    width: 280px;
+    box-sizing: border-box;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .calculator-node:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+  
+  .calculator-node.selected {
+    border: 2px solid #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Calculator node header - improved contrast */
+  .calculator-node .node-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+    border-top-left-radius: 11px;
+    border-top-right-radius: 11px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Input node specific styling */
+  .input-node {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  
+  .input-node .node-header {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+    border-bottom: 1px solid rgba(34, 197, 94, 0.3);
+  }
+  
+  /* Calculation node specific styling */
+  .calculation-node {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+  }
+  
+  .calculation-node .node-header {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+  }
+  
+  /* Display node specific styling */
+  .display-node {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+  }
+  
+  .display-node .node-header {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.3);
+  }
+  
+  /* Constant node specific styling */
+  .constant-node {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, rgba(107, 114, 128, 0.05) 100%);
+    border: 1px solid rgba(107, 114, 128, 0.3);
+  }
+  
+  .constant-node .node-header {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(107, 114, 128, 0.1) 100%);
+    border-bottom: 1px solid rgba(107, 114, 128, 0.3);
+  }
+  
+  /* Calculator node content area */
+  .calculator-node .node-content {
+    padding: 12px 0;
+  }
+  
+  /* Calculator node rows */
+  .calculator-node .node-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .calculator-node .node-row:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Calculator node labels */
+  .calculator-node .row-label {
+    color: #D1D5DB;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 8px;
+    flex-grow: 1;
+  }
+  
+  /* Calculator node values - improved contrast */
+  .calculator-node .row-value {
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.15);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    min-width: 60px;
+    text-align: center;
+  }
+  
+  /* Input node values */
+  .input-node .row-value {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+  
+  /* Calculation node values */
+  .calculation-node .row-value {
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+  }
+  
+  /* Display node values */
+  .display-node .row-value {
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    font-size: 16px;
+    font-weight: 700;
+  }
+  
+  /* Constant node values */
+  .constant-node .row-value {
+    background: rgba(107, 114, 128, 0.15);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+  }
+  
+  /* Calculator node description */
+  .calculator-node .node-description {
+    color: #9CA3AF;
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 4px;
+    padding: 0 12px;
+  }
+  
+  /* Calculator node error state */
+  .calculator-node .node-error {
+    color: #EF4444;
+    font-size: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+  
+  /* Calculator node operation badge */
+  .calculator-node .operation-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93C5FD;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+  }
+  
+  /* Input node operation badge */
+  .input-node .operation-badge {
+    background: rgba(34, 197, 94, 0.2);
+    color: #86EFAC;
+  }
+  
+  /* Calculation node operation badge */
+  .calculation-node .operation-badge {
+    background: rgba(168, 85, 247, 0.2);
+    color: #C4B5FD;
+  }
+  
+  /* Display node operation badge */
+  .display-node .operation-badge {
+    background: rgba(251, 191, 36, 0.2);
+    color: #FDE68A;
+  }
+  
+  /* Constant node operation badge */
+  .constant-node .operation-badge {
+    background: rgba(107, 114, 128, 0.2);
+    color: #D1D5DB;
+  }
+  
+  /* Calculator node unit display */
+  .calculator-node .unit-display {
+    color: #9CA3AF;
+    font-size: 11px;
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  
+  /* Calculator node slider styling */
+  .calculator-node input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+    margin: 8px 0;
+  }
+  
+  .calculator-node input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #3B82F6;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .calculator-node input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #3B82F6;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Calculator node number input styling */
+  .calculator-node input[type="number"] {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #FFFFFF;
+    padding: 4px 8px;
+    font-size: 13px;
+    width: 80px;
+  }
+  
+  .calculator-node input[type="number"]:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
